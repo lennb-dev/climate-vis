@@ -1,6 +1,7 @@
 # Globale Umweltdaten-Visualisierung
 
 Eine interaktive Webanwendung, entwickelt mit Vue 3 und D3.js, die globale Umweltdaten durch dynamische Weltkarten visualisiert. Die Anwendung bietet Einblicke in Klimawandel, CO2-Emissionen und die Nutzung erneuerbarer Energien in verschiedenen Ländern.
+Webhosted: https://climate-vis.vercel.app/
 
 ## Funktionen
 
