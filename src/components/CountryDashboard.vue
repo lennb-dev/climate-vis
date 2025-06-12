@@ -5,7 +5,7 @@
       <h1 class="text-3xl font-bold text-gray-800">{{ countryName }}</h1>
       <button @click="$emit('close')" 
         class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors duration-200 shadow-sm">
-        Schließen
+        Close
       </button>
     </div>
 
