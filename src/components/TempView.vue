@@ -110,6 +110,6 @@ const getTooltipContent = (feature, value, actualYear) => {
     return `<strong>${name}</strong><br/>no Data`
   }
   const val = d3.format('.1f')(value)
-  return `<strong>${name}</strong><br/>${val} °C average temperature anomaly<br/><em>Data from ${actualYear}</em>`
+  return `<strong>${name}</strong><br/>${val} °C temperature anomaly<br/><em>Data from ${actualYear}</em>`
 }
 </script>
