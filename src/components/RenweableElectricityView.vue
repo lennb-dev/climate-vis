@@ -111,7 +111,7 @@ const getTooltipContent = (feature, value, actualYear) => {
     return `<strong>${name}</strong><br/>no Data`
   }
   const val = d3.format('.1f')(value)
-  return `<strong>${name}</strong><br/>${val}% Share of renewable Electricity<br/><em>Data from ${actualYear}</em>`
+  return `<strong>${name}</strong><br/>${val}% share of renewable electricity<br/><em>Data from ${actualYear}</em>`
 }
 
 </script>

@@ -33,9 +33,9 @@ const currentView = ref('co2')
 const viewOptions = [
   { label: 'CO₂ Emissions', value: 'co2' },
   { label: 'Temperature',       value: 'temp' },
-  { label: 'CO₂ per Capita', value: 'co2pc' },
-  { label: 'Share of renewable Energy', value: 'eEnergy' },
-  { label: 'Share of renewable Electricity', value: 'eElectricity' }
+  { label: 'CO₂ per capita', value: 'co2pc' },
+  { label: 'Share of renewable energy', value: 'eEnergy' },
+  { label: 'Share of renewable electricity', value: 'eElectricity' }
 ]
 
 // Computed: je nach currentView die richtige Komponente wählen
