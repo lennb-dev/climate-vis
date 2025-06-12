@@ -2,6 +2,8 @@
 
 An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO2 emissions, and renewable energy usage across different countries.
 
+Webhosted: https://climate-vis.vercel.app/
+
 ## Features
 
 - **CO2 Emissions per Capita**: Display and comparison of CO2 emissions per capita across different countries over time
