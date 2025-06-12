@@ -1,6 +1,6 @@
 <template>
   <div class="piechart-container">
-    <h3 class="text-xl font-semibold">CO₂ Emissionen nach Sektor ({{ latestYear }})</h3>
+    <h3 class="text-xl font-semibold">CO₂ emissions by sector ({{ latestYear }})</h3>
     <div class="chart-wrapper">
       <template v-if="hasData">
         <svg ref="pieRef" :width="width" :height="height"></svg>
@@ -21,7 +21,7 @@
       </template>
       <template v-else>
         <div class="no-data-message">
-          Keine Daten
+          No data
         </div>
       </template>
     </div>
@@ -32,7 +32,7 @@
 <script setup>
 import * as d3 from 'd3'
 import { ref, watch, computed, onMounted} from 'vue'
-// CSV als rohen Text importieren
+// Import CSV as raw text
 import CO2SectorRaw from '../assets/co-emissions-by-sector.csv?raw'
 
 const props = defineProps({
@@ -46,8 +46,6 @@ const radius = Math.min(width, height) / 2
 const latestYear = 2021
 const hoveredSector = ref(null)
 
-
-// Daten verarbeiten
 const processedData = ref([])
 
 onMounted(() => {
@@ -73,17 +71,16 @@ function parseCSV(rawCSV) {
 
 processedData.value = parseCSV(CO2SectorRaw)
 
-// Farbskala mit modernem Set3
 const fixedColors = {
-  'Gebäude': d3.schemeSet3[0],
-  'Industrie': d3.schemeSet3[9],
-  'Landnutzung, Forstwirtschaft': d3.schemeSet3[2],
-  'Sonstige Verbrennung': d3.schemeSet3[3],
-  'Verkehr': d3.schemeSet3[4],
-  'Herstellung & Bau': d3.schemeSet3[5],
-  'Fugitive Emissionen': d3.schemeSet3[6],
-  'Strom & Wärme': d3.schemeSet3[11],
-  'Bunker-Kraftstoffe': d3.schemeSet3[8]
+  'Buildings': d3.schemeSet3[0],
+  'Industry': d3.schemeSet3[9],
+  'Land Use and Forestry': d3.schemeSet3[2],
+  'Other Fuel Combustion': d3.schemeSet3[3],
+  'Transport': d3.schemeSet3[4],
+  'Manufacturing & Construction': d3.schemeSet3[5],
+  'Fugitive Emissions': d3.schemeSet3[6],
+  'Electricity & Heat': d3.schemeSet3[11],
+  'Bunker Fuels': d3.schemeSet3[8]
 }
 
 function color(sectorName) {
@@ -91,7 +88,6 @@ function color(sectorName) {
 }
 
 
-// Sektoren für das aktuelle Land + Jahr
 const sectors = computed(() => {
   if (!props.iso || !processedData.value.length) return []
 
@@ -100,15 +96,15 @@ const sectors = computed(() => {
   if (!latest) return []
 
   return [
-    { name: 'Gebäude', value: latest['buildings'] },
-    { name: 'Industrie', value: latest['industry'] },
-    { name: 'Landnutzung, Forstwirtschaft', value: latest['land use change and forestry'] },
-    { name: 'Sonstige Verbrennung', value: latest['other fuel combustion'] },
-    { name: 'Verkehr', value: latest['transport'] },
-    { name: 'Herstellung & Bau', value: latest['manufacturing and construction'] },
-    { name: 'Fugitive Emissionen', value: latest['fugitive emissions from energy production'] },
-    { name: 'Strom & Wärme', value: latest['electricity and heat'] },
-    { name: 'Bunker-Kraftstoffe', value: latest['bunker fuels'] }
+    { name: 'Buildings', value: latest['buildings'] },
+    { name: 'Industry', value: latest['industry'] },
+    { name: 'Land Use and Forestry', value: latest['land use change and forestry'] },
+    { name: 'Other Fuel Combustion', value: latest['other fuel combustion'] },
+    { name: 'Transport', value: latest['transport'] },
+    { name: 'Manufacturing & Construction', value: latest['manufacturing and construction'] },
+    { name: 'Fugitive Emissions', value: latest['fugitive emissions from energy production'] },
+    { name: 'Electricity & Heat', value: latest['electricity and heat'] },
+    { name: 'Bunker Fuels', value: latest['bunker fuels'] }
   ].filter(s => s.value != null && !isNaN(s.value) && s.value > 0)
 })
 
@@ -125,19 +121,18 @@ function drawPie() {
 
   const pie = d3.pie().value(d => d.value).sort(null)
   const arc = d3.arc()
-    .innerRadius(radius - 140)  // dein Wert
+    .innerRadius(radius - 140)
     .outerRadius(radius - 30)
   const arcHover = d3.arc()
     .innerRadius(radius - 140)
     .outerRadius(radius - 20)
-
-  // Text in der Mitte (initial leer oder Hinweis)
+ 
   const centerText = g.append('text')
     .attr('text-anchor', 'middle')
-    .attr('dy', '0.35em')  // vertikal zentrieren
+    .attr('dy', '0.35em')
     .style('font-size', '20px')
     .style('font-weight', 'bold')
-    .text('') // Anfang leer
+    .text('')
 
   const total = d3.sum(sectors.value, d => d.value)
 
@@ -155,7 +150,7 @@ function drawPie() {
         .transition()
         .duration(300)
         .attr('d', arcHover)
-      hoveredSector.value = d.data.name  // Sektor speichern
+      hoveredSector.value = d.data.name
 
       const percent = ((d.data.value / total) * 100).toFixed(1) + '%'
       centerText.text(percent)
@@ -165,7 +160,7 @@ function drawPie() {
         .transition()
         .duration(300)
         .attr('d', arc)
-      hoveredSector.value = null  // Hover aufheben
+      hoveredSector.value = null
       centerText.text('')
     })
 }

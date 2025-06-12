@@ -49,7 +49,7 @@ onMounted(async () => {
     const worldData = await d3.json(worldGeoUrl)
     geoData.value = worldData.features || worldData
   } catch (err) {
-    console.error('Fehler beim Laden des GeoJSON:', err)
+    console.error('Error loading GeoJSON:', err)
   }
 })
 
@@ -105,11 +105,11 @@ const actualYearMap = computed(() => {
 const formatLabel = v => d3.format('.1f')(v) + ' °C'
 const getISO = feature => feature.properties['ISO3166-1-Alpha-3']
 const getTooltipContent = (feature, value, actualYear) => {
-  const name = feature.properties.ADMIN || feature.properties.name || 'Unbekannt'
+  const name = feature.properties.ADMIN || feature.properties.name || 'Unknown'
   if (value == null) {
-    return `<strong>${name}</strong><br/>keine Daten`
+    return `<strong>${name}</strong><br/>no Data`
   }
   const val = d3.format('.1f')(value)
-  return `<strong>${name}</strong><br/>${val} Durchschnitts Temperatur<br/><em>Daten von ${actualYear}</em>`
+  return `<strong>${name}</strong><br/>${val} Average Temperature<br/><em>Data from ${actualYear}</em>`
 }
 </script>

@@ -1,55 +1,55 @@
-# Globale Umweltdaten-Visualisierung
+# Global Environmental Data Visualization
 
-Eine interaktive Webanwendung, entwickelt mit Vue 3 und D3.js, die globale Umweltdaten durch dynamische Weltkarten visualisiert. Die Anwendung bietet Einblicke in Klimawandel, CO2-Emissionen und die Nutzung erneuerbarer Energien in verschiedenen Ländern.
+An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO2 emissions, and renewable energy usage across different countries.
 
-## Funktionen
+## Features
 
-- **CO2-Emissionen pro Kopf**: Anzeige und Vergleich von CO2-Emissionen pro Kopf in verschiedenen Ländern im Zeitverlauf
-- **Temperaturanomalien**: Visualisierung globaler Temperaturveränderungen und -anomalien in verschiedenen Regionen
-- **Anteil erneuerbarer Energien**: Darstellung des prozentualen Anteils erneuerbarer Energien am Gesamtenergieverbrauch nach Ländern
-- **Anteil erneuerbarer Elektrizität**: Anzeige des Anteils von Strom aus erneuerbaren Quellen
+- **CO2 Emissions per Capita**: Display and comparison of CO2 emissions per capita across different countries over time
+- **Temperature Anomalies**: Visualization of global temperature changes and anomalies in different regions
+- **Renewable Energy Share**: Representation of the percentage of renewable energy in total energy consumption by country
+- **Renewable Electricity Share**: Display of electricity generation from renewable sources
 
-## Hauptkomponenten
+## Main Components
 
-- Interaktive Weltkarten-Visualisierung mit D3.js
-- Zeitschieberegler für zeitliche Datenexploration
-- Farbcodierte Datenrepräsentation
-- Detaillierte Tooltips mit länderspezifischen Informationen
+- Interactive world map visualization using D3.js
+- Time slider for temporal data exploration
+- Color-coded data representation
+- Detailed tooltips with country-specific information
 
-## Technologie-Stack
+## Technology Stack
 
-- **Vue 3**: Frontend-Framework mit Composition API und `<script setup>`
-- **Vite**: Moderne Frontend-Entwicklungsumgebung
-- **D3.js**: Bibliothek für Datenvisualisierung
-- **CSV und GeoJSON**: Datenquellen für Umweltmetriken und geografische Informationen
+- **Vue 3**: Frontend framework with Composition API and `<script setup>`
+- **Vite**: Modern frontend development environment
+- **D3.js**: Data visualization library
+- **CSV and GeoJSON**: Data sources for environmental metrics and geographical information
 
-## Erste Schritte
+## Getting Started
 
-1. Repository klonen
-2. Abhängigkeiten installieren:
+1. Clone repository
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Entwicklungsserver starten:
+3. Start development server:
    ```bash
    npm run dev
    ```
 
-## Datenquellen
+## Data Sources
 
-Die Anwendung verwendet verschiedene Datensätze, darunter:
-- Jährliche CO2-Emissionen pro Land
-- CO2-Emissionen pro Kopf
-- Temperaturanomalien-Daten
-- Statistiken zu erneuerbaren Energien und Elektrizität
-- Geografische Weltdaten (GeoJSON)
+The application uses various datasets, including:
+- Annual CO2 emissions per country
+- CO2 emissions per capita
+- Temperature anomaly data
+- Renewable energy and electricity statistics
+- Geographic world data (GeoJSON)
 
-## Projektstruktur
+## Project Structure
 
 ```
 src/
-├── assets/         # Datendateien und andere statische Assets
-├── components/     # Vue-Komponenten
+├── assets/         # Data files and other static assets
+├── components/     # Vue components
 │   ├── WorldMap.vue
 │   ├── TimeSlider.vue
 │   ├── CO2CapitaView.vue

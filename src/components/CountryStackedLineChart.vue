@@ -1,6 +1,6 @@
 <template>
   <div class="stacked-linechart-container">
-    <h2 class="text-center text-xl font-semibold">Strommix im zeitlichen Verlauf</h2>
+    <h2 class="text-center text-xl font-semibold">Electricity share over time</h2>
     <Line ref="chartRef" :data="chartData" :options="chartOptions" />
   </div>
 </template>
@@ -69,11 +69,11 @@ const chartOptions = {
   },
   scales: {
     x: {
-      title: { display: true, text: 'Jahr' }
+      title: { display: true, text: 'Year' }
     },
     y: {
       stacked: true,
-      title: { display: true, text: 'Anteil (%)' },
+      title: { display: true, text: 'Share (%)' },
       min: 0,
       max: 100
     }
@@ -136,7 +136,7 @@ const chartData = computed(() => ({
 <style scoped>
 .stacked-linechart-container {
   position: relative;
-  height: 500px; /* fixe Höhe um Overflow zu verhindern */
+  height: 500px;
   background: white;
   padding: 12px;
   border-radius: 8px;

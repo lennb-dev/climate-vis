@@ -31,11 +31,11 @@ const currentView = ref('co2')
 
 // Optionen für den DataSwitcher
 const viewOptions = [
-  { label: 'CO₂ Emissionen', value: 'co2' },
-  { label: 'Temperatur',       value: 'temp' },
+  { label: 'CO₂ Emissions', value: 'co2' },
+  { label: 'Temperature',       value: 'temp' },
   { label: 'CO₂ per Capita', value: 'co2pc' },
-  { label: 'Anteil Erneuerbare Energie', value: 'eEnergy' },
-  { label: 'Anteil Erneuerbare Elektrizität', value: 'eElectricity' }
+  { label: 'Share of renewable Energy', value: 'eEnergy' },
+  { label: 'Share of renewable Electricity', value: 'eElectricity' }
 ]
 
 // Computed: je nach currentView die richtige Komponente wählen

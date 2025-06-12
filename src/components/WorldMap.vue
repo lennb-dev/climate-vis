@@ -152,10 +152,10 @@ function drawLegend() {
   const axis = d3.axisBottom(xScale)
     .tickValues(d3.range(props.colors.length))
     .tickFormat(i => {
-      if (i === 0) return 'Keine Daten'
+      if (i === 0) return 'No Data'
       const v = props.thresholds[i - 1]
       return props.valueKey === 'CO2'
-        ? (v >= 1e9 ? `${v/1e9} Mrd.` : v >= 1e6 ? `${v/1e6} Mio.` : `${v}`)
+        ? (v >= 1e9 ? `${v/1e9} B.` : v >= 1e6 ? `${v/1e6} M.` : `${v}`)
         : d3.format('.1f')(v)
     })
 
@@ -304,9 +304,9 @@ function drawTooltipChart(iso) {
 
   function formatYAxisTick(value) {
     const absVal = Math.abs(value)
-    if (absVal >= 1e9) return (value / 1e9).toFixed(1) + ' Mrd'
-    if (absVal >= 1e6) return (value / 1e6).toFixed(1) + ' Mio'
-    if (absVal >= 1e3) return (value / 1e3).toFixed(1) + ' Tsd'
+    if (absVal >= 1e9) return (value / 1e9).toFixed(1) + ' B'
+    if (absVal >= 1e6) return (value / 1e6).toFixed(1) + ' M'
+    if (absVal >= 1e3) return (value / 1e3).toFixed(1) + ' K'
     return value.toFixed(0)
   }
 

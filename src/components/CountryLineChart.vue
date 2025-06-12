@@ -51,7 +51,7 @@
       class=" flex flex-col items-center gap-2"
     >
       <label for="startYearRange" class="font-medium text-sm text-gray-800">
-        Startjahr: <span class="font-bold text-gray-800">{{ startYear }}</span>
+        Starting year: <span class="font-bold text-gray-800">{{ startYear }}</span>
       </label>
       <input
         id="startYearRange"
@@ -95,7 +95,6 @@ const height = ref(500)
 const allMetrics = ref([])
 const selectedMetrics = ref([])
 
-// Für Timeslider
 const startYear = ref(null)
 const minYear = ref(1940)
 const maxYear = ref(null)
@@ -112,7 +111,7 @@ const customPalette = [
   ]
 
   const colorScale = d3.scaleOrdinal()
-    .domain(allMetrics.value) // oder setze es dynamisch später
+    .domain(allMetrics.value)
     .range(customPalette)
 
   function color(metric) {
@@ -140,13 +139,13 @@ function parseCSV(raw, valueKey, metricName) {
 
 const processedData = [
   ...parseCSV(CO2Raw, 'CO2', 'CO₂'),
-  //...parseCSV(CO2CapitaRaw, 'CO2', 'CO₂ pro Kopf'),
-  ...parseCSV(TempRaw, 'Temperature anomaly', 'Temperatur'),
-  ...parseCSV(EnergyShareRaw, 'Share', 'Anteil erneuerbarer Energie'),
-  ...parseCSV(ElectricityShareRaw, 'Share', 'Anteil erneuerbaren Stroms')
+  //...parseCSV(CO2CapitaRaw, 'CO2', 'CO₂ per capita'),
+  ...parseCSV(TempRaw, 'Temperature anomaly', 'Temperature'),
+  ...parseCSV(EnergyShareRaw, 'Share', 'Share of renewable energy'),
+  ...parseCSV(ElectricityShareRaw, 'Share', 'Share of renewable electricity')
 ]
 
-// Auf ISO, Metriken und Slider-Änderungen reagieren
+
 watch(
   [() => props.iso, selectedMetrics, startYear], 
   drawChart, 
@@ -162,7 +161,7 @@ onMounted(async () => {
     height.value = 500
   }
 
-  const allTempData = processedData.filter(d => d.metric === 'Temperatur' && d.iso === props.iso)
+  const allTempData = processedData.filter(d => d.metric === 'Temperature' && d.iso === props.iso)
   globalTempExtent.value = d3.extent(allTempData, d => d.value)
   const metrics = [...new Set(processedData.map(d => d.metric))]
   allMetrics.value = metrics
@@ -201,7 +200,7 @@ function drawChart() {
   )
   const allYears = [...new Set(filtered.map(d => d.year))].sort()
 
-  const tempData = grouped.get('Temperatur') || []
+  const tempData = grouped.get('Temperature') || []
   const tempExtent = d3.extent(tempData, d => d.value)
 
   const groupedFull = d3.group(
@@ -210,7 +209,7 @@ function drawChart() {
   )
 
   const metricsToNormalize = [...grouped.keys()].filter(
-    m => m !== 'Temperatur' && !['Anteil erneuerbarer Energie', 'Anteil erneuerbaren Stroms'].includes(m)
+    m => m !== 'Temperature' && !['Share of renewable energy', 'Share of renewable electricity'].includes(m)
   )
   const metricRanges = {}
   for (const metric of metricsToNormalize) {
@@ -237,12 +236,12 @@ function drawChart() {
     const sorted = values.sort((a, b) => a.year - b.year)
     let lineGenerator
 
-    if (metric === 'Temperatur') {
+    if (metric === 'Temperature') {
       lineGenerator = d3.line()
         .x(d => x(d.year))
         .y(d => yTemp(d.value))
         .curve(d3.curveMonotoneX)
-    } else if (['Anteil erneuerbarer Energie', 'Anteil erneuerbaren Stroms'].includes(metric)) {
+    } else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) {
       lineGenerator = d3.line()
         .x(d => x(d.year))
         .y(d => yNorm(d.value / 100))
@@ -266,12 +265,12 @@ function drawChart() {
   g.append('g').call(d3.axisLeft(yTemp)).selectAll('text').style('font-size', '10px')
   g.append('text')
   .attr('transform', 'rotate(-90)')
-  .attr('y', -50)           // Position links von Achse anpassen
+  .attr('y', -50)
   .attr('x', -innerHeight / 2)
   .attr('dy', '1em')
   .style('text-anchor', 'middle')
   .style('font-size', '12px')
-  .text('Temperatur (°C)')
+  .text('Temperature (°C)')
 
 
   g.append('g')
@@ -346,8 +345,8 @@ function drawChart() {
       if (!entry) return
 
       let yVal
-      if (metric === 'Temperatur') yVal = yTemp(entry.value)
-      else if (['Anteil erneuerbarer Energie', 'Anteil erneuerbaren Stroms'].includes(metric)) {
+      if (metric === 'Temperature') yVal = yTemp(entry.value)
+      else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) {
         yVal = yNorm(entry.value / 100)
       } else {
         const { min, max } = metricRanges[metric]
@@ -355,8 +354,8 @@ function drawChart() {
       }
 
       let unit = ''
-      if (metric === 'Temperatur') unit = '°C'
-      else if (['Anteil erneuerbarer Energie', 'Anteil erneuerbaren Stroms'].includes(metric)) unit = '%'
+      if (metric === 'Temperature') unit = '°C'
+      else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) unit = '%'
       else unit = 't'
 
       visibleEntries.push({ metric, value: entry.value, unit, y: yVal })
@@ -377,7 +376,7 @@ function drawChart() {
         .attr('font-size', '12px')
         .attr('fill', '#333')
         .text(() => {
-          if (entry.metric === 'CO₂' || entry.metric === 'CO₂ pro Kopf') {
+          if (entry.metric === 'CO₂' || entry.metric === 'CO₂ per capita') {
             return `${entry.metric}: ${formatCO2(entry.value)}`
           } else {
             return `${entry.metric}: ${entry.value.toFixed(2)} ${entry.unit}`
@@ -416,9 +415,9 @@ function drawChart() {
 }
 
 function formatCO2(value) {
-  if (value >= 1e9) return (value / 1e9).toFixed(2) + ' Mrd t'
-  if (value >= 1e6) return (value / 1e6).toFixed(2) + ' Mio t'
-  if (value >= 1e3) return (value / 1e3).toFixed(2) + ' Tsd t'
+  if (value >= 1e9) return (value / 1e9).toFixed(2) + ' B t'
+  if (value >= 1e6) return (value / 1e6).toFixed(2) + ' M t'
+  if (value >= 1e3) return (value / 1e3).toFixed(2) + ' K t'
   return value.toFixed(2) + ' t'
 }
 
