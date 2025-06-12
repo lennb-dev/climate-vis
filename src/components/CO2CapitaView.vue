@@ -108,8 +108,7 @@ const getTooltipContent = (feature, value, actualYear) => {
   const name = feature.properties.ADMIN || feature.properties.name || 'Unknown'
   if (value == null) {
     return `<strong>${name}</strong><br/>no Data`
-  }
-  const val = d3.format(',')(value) + ' t CO₂'
+  }  const val = d3.format(',.2f')(value) + ' t CO₂'
   return `<strong>${name}</strong><br/>${val} per capita <br/><em>Data from ${actualYear}</em>`
 }
 

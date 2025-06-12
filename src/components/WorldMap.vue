@@ -154,9 +154,17 @@ function drawLegend() {
     .tickFormat(i => {
       if (i === 0) return 'No Data'
       const v = props.thresholds[i - 1]
-      return props.valueKey === 'CO2'
-        ? (v >= 1e9 ? `${v/1e9} B.` : v >= 1e6 ? `${v/1e6} M.` : `${v}`)
-        : d3.format('.1f')(v)
+      switch(props.valueKey) {
+        case 'CO2':
+          return v >= 1e9 ? `${v/1e9}B t` : v >= 1e6 ? `${v/1e6}M t` : `${v} t`
+        case 'Temperature':
+          return `${d3.format('.1f')(v)}°C`
+        case 'ElectricityShare':
+        case 'EnergyShare':
+          return `${d3.format('.0f')(v)}%`
+        default:
+          return d3.format('.1f')(v)
+      }
     })
 
   svgL.append('g')
