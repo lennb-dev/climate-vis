@@ -110,7 +110,7 @@ const getTooltipContent = (feature, value, actualYear) => {
     return `<strong>${name}</strong><br/>no Data`
   }
   const val = d3.format(',')(value) + ' t CO₂'
-  return `<strong>${name}</strong><br/>${val}<br/><em>Data from ${actualYear}</em>`
+  return `<strong>${name}</strong><br/>${val} per capita <br/><em>Data from ${actualYear}</em>`
 }
 
 </script>
