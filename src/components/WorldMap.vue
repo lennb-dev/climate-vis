@@ -130,12 +130,13 @@ function drawLegend() {
       .attr('stroke', '#999')
       .attr('stroke-width', 1)
 
-  const legendMargin = { left: 30 } // Add margin for "No Data" label
-  const segW = (width - legendMargin.left) / props.colors.length // Adjust width to account for margin
+  const legendMargin = { left: 30, right: 30 }
+  const legendWidth = width - legendMargin.left - legendMargin.right
+  const segW = legendWidth / props.colors.length
   props.colors.forEach((color, i) => {
     const fill = i === 0 ? 'url(#legendHatch)' : color
     svgL.append('rect')
-      .attr('x', legendMargin.left + (i * segW)) // Add margin to x position
+      .attr('x', legendMargin.left + (i * segW))
       .attr('y', 0)
       .attr('width', segW)
       .attr('height', 10)
@@ -148,7 +149,7 @@ function drawLegend() {
 
   const xScale = d3.scaleLinear()
     .domain([0, props.colors.length])
-    .range([legendMargin.left, width]) // Start from margin
+    .range([legendMargin.left, width - legendMargin.right])
 
   const axis = d3.axisBottom(xScale)
     .tickValues(d3.range(props.colors.length))
@@ -181,7 +182,7 @@ function drawLegend() {
   svgL.append('rect')
   .attr('x', legendMargin.left)
   .attr('y', 0)
-  .attr('width', width - legendMargin.left)
+  .attr('width', width - legendMargin.left - legendMargin.right)
   .attr('height', 10)
   .attr('fill', 'none')
   .attr('stroke', '#000')
