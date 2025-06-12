@@ -31,7 +31,7 @@ const currentView = ref('co2')
 
 // Optionen für den DataSwitcher
 const viewOptions = [
-  { label: 'CO₂ Emissions', value: 'co2' },
+  { label: 'CO₂ emissions', value: 'co2' },
   { label: 'CO₂ per capita', value: 'co2pc' },
   { label: 'Temperature',       value: 'temp' },
   { label: 'Share of renewable energy', value: 'eEnergy' },
