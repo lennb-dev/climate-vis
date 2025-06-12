@@ -5,7 +5,7 @@
     <svg ref="legendRef" :width="width" height="60" class="mt-2.5 block"></svg>
   </div>
 
-  <!-- Linechart Bereich -->
+  <!-- Dashboard Bereich -->
   <div v-if="selectedCountryISO" class="p-4 bg-gray-100 absolute top-0 left-0 w-full h-full z-50 overflow-y-auto">
     <Dashboard
       :iso="selectedCountryISO"
@@ -325,7 +325,5 @@ function drawTooltipChart(iso) {
     .selectAll('text')
     .style('font-size', '10px')
 }
-
-
 
 </script>

@@ -36,7 +36,7 @@ import csvRaw from '../assets/co-emissions-per-capita.csv?raw'
 import worldGeoUrl from '../assets/worldmap.geojson?url'
 
 // 1) Schwellen und Farben für CO2-Emissionen
-const thresholds = [0, 5, 10, 15, 20, 25, 30]
+const thresholds = [0, 2.5, 5, 7.5, 10, 12.5, 15]
 const colors = [
   '#ffffff', '#ffeda0', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c',
   '#bd0026', '#800026'

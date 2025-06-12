@@ -1,6 +1,6 @@
 <template>
   <div class="p-8 bg-gray-50 min-h-screen">
-    <!-- Header with modern styling -->
+    <!-- Header -->
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-800">{{ countryName }}</h1>
       <button @click="$emit('close')" 

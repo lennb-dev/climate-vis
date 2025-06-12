@@ -31,7 +31,6 @@
     options: {
       type: Array,
       required: true,
-      // z.B. [{ label: 'CO₂ Emissionen', value: 'co2' }, ...]
     },
     modelValue: {
       type: String,
