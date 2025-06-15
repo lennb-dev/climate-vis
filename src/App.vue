@@ -18,7 +18,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 
-// Komponenten importieren
+// Import components
 import DataSwitcher from './components/DataSwitcher.vue'
 import CO2View from './components/CO2View.vue'
 import CO2CapitaView from './components/CO2CapitaView.vue'
@@ -26,10 +26,10 @@ import TempView from './components/TempView.vue'
 import RenewableEnergyView from './components/RenewableEnergyView.vue'
 import RenweableElectricityView from './components/RenweableElectricityView.vue'
 
-// State: welche View gerade aktiv ist
+// Current view state
 const currentView = ref('co2')
 
-// Optionen für den DataSwitcher
+// View options for the DataSwitcher
 const viewOptions = [
   { label: 'CO₂ emissions', value: 'co2' },
   { label: 'CO₂ per capita', value: 'co2pc' },
@@ -38,7 +38,7 @@ const viewOptions = [
   { label: 'Share of renewable electricity', value: 'eElectricity' }
 ]
 
-// Computed: je nach currentView die richtige Komponente wählen
+// Computed: dynamically select the view component based on currentView
 const viewComponent = computed(() => {
   switch (currentView.value) {
     case 'temp':
