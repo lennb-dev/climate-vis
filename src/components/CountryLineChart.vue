@@ -36,13 +36,13 @@
         <div
           v-for="metric in selectedMetrics"
           :key="metric"
-          class="flex items-center gap-2"
+          class="flex gap-2 items-start"
         >
           <span
-            class="inline-block w-4 h-4 rounded-full"
-            :style="{ backgroundColor: color(metric) }"
+            class="w-4 h-4 rounded-full flex-shrink-0 mt-1"
+            :style="{ backgroundColor: color(metric), display: 'inline-block' }"
           ></span>
-          {{ metric }}
+          <span class="break-words">{{ metric }}</span>
         </div>
       </div>
     </div>
