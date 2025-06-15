@@ -3,7 +3,10 @@
     <h3 class="text-xl font-semibold">CO₂ emissions by sector ({{ latestYear }})</h3>
     <div class="chart-wrapper">
       <template v-if="hasData">
+        <!-- SVG pie chart -->
         <svg ref="pieRef" :width="width" :height="height"></svg>
+
+        <!-- Legend for sector colors -->
         <div class="legend">
           <div
             v-for="sector in sectors"
@@ -19,6 +22,8 @@
           </div>
         </div>
       </template>
+
+      <!-- No data fallback -->
       <template v-else>
         <div class="no-data-message">
           No data
@@ -28,17 +33,17 @@
   </div>
 </template>
 
-
 <script setup>
 import * as d3 from 'd3'
-import { ref, watch, computed, onMounted} from 'vue'
-// Import CSV as raw text
-import CO2SectorRaw from '../assets/co-emissions-by-sector.csv?raw'
+import { ref, watch, computed, onMounted } from 'vue'
+import CO2SectorRaw from '../assets/co-emissions-by-sector.csv?raw' // CSV as raw text
 
+// Props
 const props = defineProps({
-  iso: String,
+  iso: String
 })
 
+// Chart config
 const pieRef = ref(null)
 const width = 400
 const height = 400
@@ -46,12 +51,10 @@ const radius = Math.min(width, height) / 2
 const latestYear = 2021
 const hoveredSector = ref(null)
 
+// Processed sector data
 const processedData = ref([])
 
-onMounted(() => {
-  drawPie()
-})
-
+// Parse CSV data into numeric format
 function parseCSV(rawCSV) {
   const parsed = d3.csvParse(rawCSV)
   return parsed.map(row => {
@@ -71,6 +74,7 @@ function parseCSV(rawCSV) {
 
 processedData.value = parseCSV(CO2SectorRaw)
 
+// Color scale by sector
 const fixedColors = {
   'Buildings': d3.schemeSet3[0],
   'Industry': d3.schemeSet3[9],
@@ -83,11 +87,12 @@ const fixedColors = {
   'Bunker Fuels': d3.schemeSet3[8]
 }
 
+// Get color for a given sector
 function color(sectorName) {
   return fixedColors[sectorName]
 }
 
-
+// Computed: Filtered and structured sector data for the selected country
 const sectors = computed(() => {
   if (!props.iso || !processedData.value.length) return []
 
@@ -108,8 +113,10 @@ const sectors = computed(() => {
   ].filter(s => s.value != null && !isNaN(s.value) && s.value > 0)
 })
 
+// Computed: Whether we have data to show
 const hasData = computed(() => sectors.value.length > 0)
 
+// D3 pie chart rendering
 function drawPie() {
   if (!pieRef.value || sectors.value.length === 0) return
 
@@ -126,7 +133,7 @@ function drawPie() {
   const arcHover = d3.arc()
     .innerRadius(radius - 140)
     .outerRadius(radius - 20)
- 
+
   const centerText = g.append('text')
     .attr('text-anchor', 'middle')
     .attr('dy', '0.35em')
@@ -150,24 +157,29 @@ function drawPie() {
         .transition()
         .duration(300)
         .attr('d', arcHover)
-      hoveredSector.value = d.data.name
 
+      hoveredSector.value = d.data.name
       const percent = ((d.data.value / total) * 100).toFixed(1) + '%'
       centerText.text(percent)
     })
-    .on('mouseout', function (event, d) {
+    .on('mouseout', function () {
       d3.select(this)
         .transition()
         .duration(300)
         .attr('d', arc)
+
       hoveredSector.value = null
       centerText.text('')
     })
 }
 
-
-
+// Redraw chart on data/prop change
 watch([() => props.iso, sectors], drawPie, { immediate: true })
+
+// Initial render
+onMounted(() => {
+  drawPie()
+})
 </script>
 
 <style scoped>
@@ -224,5 +236,4 @@ watch([() => props.iso, sectors], drawPie, { immediate: true })
   color: #666;
   padding: 40px;
 }
-
 </style>

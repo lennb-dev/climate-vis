@@ -1,12 +1,13 @@
 <template>
   <div class="stacked-linechart-container">
     <h2 class="text-center text-xl font-semibold">Electricity share over time</h2>
+    <!-- Stacked line chart -->
     <Line ref="chartRef" :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -22,7 +23,7 @@ import {
 import * as d3 from 'd3'
 import ElectricitySourceRaw from '../assets/share-electricity-source.csv?raw'
 
-// Chart.js Komponenten registrieren
+// Register Chart.js modules
 ChartJS.register(
   Title,
   Tooltip,
@@ -40,7 +41,7 @@ const props = defineProps({
 
 const chartRef = ref(null)
 
-// Farbskala & Quellen
+// Energy sources and color palette
 const energySources = ['Coal', 'Gas', 'Nuclear', 'Hydro', 'Solar', 'Wind']
 const customPalette = {
   Coal: '#444444',
@@ -51,10 +52,11 @@ const customPalette = {
   Wind: '#a3c0e8'
 }
 
-// Rohdaten als reactive Variable
+// Parse CSV data
 const rawData = ref([])
+rawData.value = parseCSV(ElectricitySourceRaw)
 
-// Chart Options (stapelbarer Bereichs-Chart)
+// Chart.js options
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -80,7 +82,7 @@ const chartOptions = {
   }
 }
 
-// CSV Parsing & Typisierung
+// Parse CSV to array of objects
 function parseCSV(rawCSV) {
   const parsed = d3.csvParse(rawCSV)
   return parsed.map(row => ({
@@ -96,24 +98,19 @@ function parseCSV(rawCSV) {
   }))
 }
 
-rawData.value = parseCSV(ElectricitySourceRaw)
-
-// Computed Labels (Jahre)
+// Chart labels (years)
 const chartLabels = computed(() => {
   if (!props.iso || rawData.value.length === 0) return []
-
   const filtered = rawData.value.filter(d => d.Code === props.iso)
   filtered.sort((a, b) => d3.ascending(a.Year, b.Year))
   return filtered.map(d => d.Year)
 })
 
-// Computed Datasets (Energieträger-Daten)
+// Chart datasets (energy sources)
 const chartDatasets = computed(() => {
   if (!props.iso || rawData.value.length === 0) return []
-
   const filtered = rawData.value.filter(d => d.Code === props.iso)
   filtered.sort((a, b) => d3.ascending(a.Year, b.Year))
-
   return energySources.map(source => ({
     label: source,
     data: filtered.map(d => d[source] ?? 0),
@@ -126,7 +123,7 @@ const chartDatasets = computed(() => {
   }))
 })
 
-// Zusammengesetzte Chart-Daten
+// Chart data object
 const chartData = computed(() => ({
   labels: chartLabels.value,
   datasets: chartDatasets.value

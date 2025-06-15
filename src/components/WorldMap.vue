@@ -1,11 +1,11 @@
 <template>
-  <!-- Map Bereich -->
+  <!-- Main map area -->
   <div v-show="!selectedCountryISO" class="relative flex flex-col items-center max-w-[960px] mx-auto">
     <svg ref="svgRef" :width="width" :height="height" class="block"></svg>
     <svg ref="legendRef" :width="width" height="60" class="mt-2.5 block"></svg>
   </div>
 
-  <!-- Dashboard Bereich -->
+  <!-- Dashboard overlay for selected country -->
   <div v-if="selectedCountryISO" class="p-4 bg-gray-100 absolute top-0 left-0 w-full h-full z-50 overflow-y-auto">
     <Dashboard
       :iso="selectedCountryISO"
@@ -14,7 +14,7 @@
     />
   </div>
 
-  <!-- Tooltip -->
+  <!-- Tooltip overlay -->
   <div
     v-if="tooltip.visible"
     :style="{ top: tooltip.y + 'px', left: tooltip.x + 'px' }"
@@ -35,6 +35,7 @@ import Dashboard from './CountryDashboard.vue'
 import { ref, reactive, onMounted, watch, nextTick, defineProps } from 'vue'
 import * as d3 from 'd3'
 
+// Props for map and data
 const props = defineProps({
   geoData: Array,
   year: Number,
@@ -63,20 +64,22 @@ const tooltip = reactive({ visible: false, x: 0, y: 0, content: '' })
 
 let colorScale, projection, pathGenerator, mapGroup
 
+// Initialize color scale
 function initScales() {
   colorScale = d3.scaleThreshold()
     .domain(props.thresholds)
     .range(props.colors)
 }
 
+// Initialize map projection and path
 function initMap() {
   projection = d3.geoMercator().scale(140).translate([width / 2, height / 1.7])
   pathGenerator = d3.geoPath().projection(projection)
-
   const svg = d3.select(svgRef.value)
   mapGroup = svg.append('g')
 }
 
+// Draw map and legend
 function drawInitialMap() {
   mapGroup
     .selectAll('path.country')
@@ -99,6 +102,7 @@ function drawInitialMap() {
   drawLegend()
 }
 
+// Update country fill colors
 function updateFills() {
   mapGroup
     .selectAll('path.country')
@@ -107,14 +111,10 @@ function updateFills() {
       const val = props.dataMap.get(iso)
       return val != null ? colorScale(val) : 'url(#legendHatch)'
     })
-    .attr('fill-opacity', d => {
-      const iso = props.getISO(d)
-      const actualYear = props.actualYearMap.get(iso)
-      // hier kannst du noch Logik für fill-opacity ergänzen, falls gewünscht
-      return 1
-    })
+    .attr('fill-opacity', d => 1)
 }
 
+// Draw color legend
 function drawLegend() {
   const svgL = d3.select(legendRef.value)
   svgL.selectAll('*').remove()
@@ -180,14 +180,15 @@ function drawLegend() {
   svgL.selectAll('path,line').style('stroke', '#000')
 
   svgL.append('rect')
-  .attr('x', legendMargin.left)
-  .attr('y', 0)
-  .attr('width', width - legendMargin.left - legendMargin.right)
-  .attr('height', 10)
-  .attr('fill', 'none')
-  .attr('stroke', '#000')
+    .attr('x', legendMargin.left)
+    .attr('y', 0)
+    .attr('width', width - legendMargin.left - legendMargin.right)
+    .attr('height', 10)
+    .attr('fill', 'none')
+    .attr('stroke', '#000')
 }
 
+// Highlight countries by legend color
 function highlightCountriesByColor(targetColor) {
   d3.select(svgRef.value).selectAll('path.country').each(function(feature) {
     const iso = props.getISO(feature)
@@ -206,6 +207,7 @@ function highlightCountriesByColor(targetColor) {
     })
 }
 
+// Reset highlight on legend
 function resetHighlight() {
   d3.select(svgRef.value).selectAll('path.country')
     .attr('stroke-width', 0.5).style('fill-opacity', 1).style('stroke-opacity', 1)
@@ -213,6 +215,7 @@ function resetHighlight() {
     .attr('stroke', 'none')
 }
 
+// Tooltip mouse events
 function onMouseOver(event, feature) {
   const iso = props.getISO(feature)
   const val = props.dataMap.get(iso)
@@ -238,21 +241,25 @@ function onMouseClick(event, feature) {
   selectedCountryName.value = feature.properties.ADMIN || feature.properties.name
 }
 
+// Initialize map on mount
 onMounted(() => {
   initScales()
   initMap()
   drawInitialMap()
 })
 
+// Redraw map if geoData changes
 watch(() => props.geoData, (newGeo) => {
   if (newGeo && newGeo.length) drawInitialMap()
 }, { immediate: true })
 
+// Update fills on year/data change
 watch([
   () => props.year,
   () => props.dataMap
 ], () => updateFills())
 
+// Draw small tooltip chart
 function drawTooltipChart(iso) {
   const svg = d3.select(tooltipChart.value)
   svg.selectAll('*').remove()
@@ -284,17 +291,17 @@ function drawTooltipChart(iso) {
 
   const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
 
-  // Zeichne jedes Liniensegment mit der Farbe des zweiten Punktes
+  // Draw each line segment with color
   for (let i = 1; i < series.length; i++) {
     const segment = [series[i - 1], series[i]]
     g.append('path')
-    .datum(segment)
-    .attr('fill', 'none')
-    .attr('stroke', '#999')
-    .attr('stroke-width', 3.2)
-    .attr('stroke-linejoin', 'round')
-    .attr('stroke-linecap', 'round')
-    .attr('d', line)
+      .datum(segment)
+      .attr('fill', 'none')
+      .attr('stroke', '#999')
+      .attr('stroke-width', 3.2)
+      .attr('stroke-linejoin', 'round')
+      .attr('stroke-linecap', 'round')
+      .attr('d', line)
 
     g.append('path')
       .datum(segment)

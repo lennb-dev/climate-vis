@@ -24,46 +24,45 @@
   </div>
 </template>
   
-  <script setup>
-  import { defineProps, defineEmits } from 'vue'
+<script setup>
+import { defineProps, defineEmits } from 'vue'
   
-  const props = defineProps({
-    options: {
-      type: Array,
-      required: true,
-    },
-    modelValue: {
-      type: String,
-      required: true
-    }
-  })
+const props = defineProps({
+  options: {
+    type: Array,
+    required: true,
+  },
+  modelValue: {
+    type: String,
+    required: true
+  }
+})
   
-  const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
   
-  // Wechselt die Auswahl und setzt den Fokus auf den aktiven Tab
-  function updateSelection(value) {
-    emit('update:modelValue', value)
-    // Fokus auf den neu aktiven Button
-    const btn = document.getElementById(`tab-${value}`)
-    btn && btn.focus()
+// Update selection and focus active tab
+function updateSelection(value) {
+  emit('update:modelValue', value)
+  const btn = document.getElementById(`tab-${value}`)
+  btn && btn.focus()
+}
+  
+// Keyboard navigation for tabs
+function onKeydown(event) {
+  const { key } = event
+  const idx = props.options.findIndex(opt => opt.value === props.modelValue)
+  let newIdx = idx
+  
+  if (key === 'ArrowRight') {
+    newIdx = (idx + 1) % props.options.length
+  } else if (key === 'ArrowLeft') {
+    newIdx = (idx - 1 + props.options.length) % props.options.length
+  } else {
+    return
   }
   
-  // Tastatur-Navigation: Links/Rechts über Tabs springen
-  function onKeydown(event) {
-    const { key } = event
-    const idx = props.options.findIndex(opt => opt.value === props.modelValue)
-    let newIdx = idx
-  
-    if (key === 'ArrowRight') {
-      newIdx = (idx + 1) % props.options.length
-    } else if (key === 'ArrowLeft') {
-      newIdx = (idx - 1 + props.options.length) % props.options.length
-    } else {
-      return
-    }
-  
-    event.preventDefault()
-    const newValue = props.options[newIdx].value
-    updateSelection(newValue)
-  }
-  </script>
+  event.preventDefault()
+  const newValue = props.options[newIdx].value
+  updateSelection(newValue)
+}
+</script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- WorldMap mit allen nötigen Props -->
+    <!-- WorldMap with all required props -->
     <WorldMap
       :geoData="geoData"
       :year="year"
@@ -14,7 +14,7 @@
       :data="csvData"
       valueKey="Temperature"
     />
-    <!-- TimeSlider zum Wechseln des Jahres -->
+    <!-- TimeSlider for year selection -->
     <TimeSlider
       v-model="year"
       :minYear="minYear"
@@ -27,22 +27,22 @@
 import { ref, computed, onMounted } from 'vue'
 import * as d3 from 'd3'
 
-// Komponenten
+// Components
 import WorldMap from './WorldMap.vue'
 import TimeSlider from './TimeSlider.vue'
 
-// CSV- und GeoJSON-Assets
+// Import CSV and GeoJSON
 import csvRaw from '../assets/annual-temperature-anomalies.csv?raw'
 import worldGeoUrl from '../assets/worldmap.geojson?url'
 
-// 1) Schwellen und Farben für Temperatur-Anomalien
+// Thresholds and colors for temperature anomalies
 const thresholds = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5]
 const colors = [
   '#6baed6', '#9ecae1', '#c6dbef', '#e0ecf4',
   '#ffffff', '#ffeda0', '#feb24c', '#fd8d3c', '#e31a1c'
 ]
 
-// 2) GeoJSON laden (einmalig)
+// Load GeoJSON data
 const geoData = ref([])
 onMounted(async () => {
   try {
@@ -53,24 +53,24 @@ onMounted(async () => {
   }
 })
 
-// 3) Temperatur-Daten parsen
+// Parse temperature data
 const rawRows = d3.csvParse(csvRaw)
 const csvData = rawRows
   .filter(d => d.Code && !isNaN(+d['Temperature anomaly']))
   .map(d => ({ iso: d.Code, year: +d.Year, value: +d['Temperature anomaly'] }))
 
-// 4) Jahresbereich bestimmen
+// Calculate year range
 const years = Array.from(new Set(csvData.map(d => d.year))).sort((a, b) => a - b)
 const minYear = years[0]
 const maxYear = years[years.length - 1]
 const year = ref(maxYear)
 
-// 5) Map<ISO, Wert> für aktuelles Jahr
+// Map<ISO, value> for current year
 const yearDataMap = computed(() => {
   const m = new Map()
   const seen = new Set()
 
-  // Sortiere Daten nach Jahr absteigend
+  // Sort data by year descending
   const sortedData = csvData
     .filter(d => d.year <= year.value)
     .sort((a, b) => b.year - a.year)
@@ -85,7 +85,7 @@ const yearDataMap = computed(() => {
   return m
 })
 
-
+// Map<ISO, year> for current year
 const actualYearMap = computed(() => {
   const m = new Map()
   const seen = new Set()
@@ -101,7 +101,7 @@ const actualYearMap = computed(() => {
   return m
 })
 
-// 6) Label- und Tooltip-Funktionen
+// Label and tooltip formatting
 const formatLabel = v => d3.format('.1f')(v) + ' °C'
 const getISO = feature => feature.properties['ISO3166-1-Alpha-3']
 const getTooltipContent = (feature, value, actualYear) => {

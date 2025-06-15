@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- WorldMap mit allen nötigen Props -->
+    <!-- WorldMap with required props -->
     <WorldMap
       :geoData="geoData"
       :year="year"
@@ -14,7 +14,7 @@
       :data="csvData"
       valueKey="CO2"
     />
-    <!-- TimeSlider zum Wechseln des Jahres -->
+    <!-- TimeSlider for year selection -->
     <TimeSlider
       v-model="year"
       :minYear="minYear"
@@ -27,22 +27,22 @@
 import { ref, computed, onMounted } from 'vue'
 import * as d3 from 'd3'
 
-// Komponenten
+// Components
 import WorldMap from './WorldMap.vue'
 import TimeSlider from './TimeSlider.vue'
 
-// CSV- und GeoJSON-Assets
+// CSV and GeoJSON assets
 import csvRaw from '../assets/co-emissions-per-capita.csv?raw'
 import worldGeoUrl from '../assets/worldmap.geojson?url'
 
-// 1) Schwellen und Farben für CO2-Emissionen
+// CO2 per capita thresholds and color scale
 const thresholds = [0, 2.5, 5, 7.5, 10, 12.5, 15]
 const colors = [
   '#ffffff', '#ffeda0', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c',
   '#bd0026', '#800026'
 ]
 
-// 2) GeoJSON laden (einmalig)
+// Load GeoJSON data once
 const geoData = ref([])
 onMounted(async () => {
   try {
@@ -53,39 +53,36 @@ onMounted(async () => {
   }
 })
 
-// 3) CO2-Daten parsen
+// Parse CO2 per capita CSV data
 const rawRows = d3.csvParse(csvRaw)
 const csvData = rawRows
   .filter(d => d.Code && !isNaN(+d.CO2))
   .map(d => ({ iso: d.Code, year: +d.Year, value: +d.CO2 }))
 
-// 4) Jahresbereich bestimmen
+// Determine year range
 const years = Array.from(new Set(csvData.map(d => d.year))).sort((a, b) => a - b)
 const minYear = years[0]
 const maxYear = years[years.length - 1]
 const year = ref(maxYear)
 
-// 5) Map<ISO, Wert> für aktuelles Jahr
+// Map<ISO, value> for selected year
 const yearDataMap = computed(() => {
   const m = new Map()
   const seen = new Set()
-
-  // Sortiere Daten nach Jahr absteigend
+  // Sort by year descending
   const sortedData = csvData
     .filter(d => d.year <= year.value)
     .sort((a, b) => b.year - a.year)
-
   for (const d of sortedData) {
     if (!seen.has(d.iso)) {
       m.set(d.iso, d.value)
       seen.add(d.iso)
     }
   }
-
   return m
 })
 
-
+// Map<ISO, actual year> for selected year
 const actualYearMap = computed(() => {
   const m = new Map()
   const seen = new Set()
@@ -101,14 +98,15 @@ const actualYearMap = computed(() => {
   return m
 })
 
-// 6) Label- und Tooltip-Funktionen
+// Label and tooltip formatting
 const formatLabel = v => d3.format('.2s')(v) + ' t'
 const getISO = feature => feature.properties['ISO3166-1-Alpha-3']
 const getTooltipContent = (feature, value, actualYear) => {
   const name = feature.properties.ADMIN || feature.properties.name || 'Unknown'
   if (value == null) {
     return `<strong>${name}</strong><br/>no Data`
-  }  const val = d3.format(',.2f')(value) + ' t CO₂'
+  }
+  const val = d3.format(',.2f')(value) + ' t CO₂'
   return `<strong>${name}</strong><br/>${val} per capita <br/><em>Data from ${actualYear}</em>`
 }
 

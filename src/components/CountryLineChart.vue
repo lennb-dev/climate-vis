@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white rounded-2xl  p-6 max-w-6xl mx-auto w-full relative">
+  <div class="bg-white rounded-2xl p-6 max-w-6xl mx-auto w-full relative">
     <h2 class="text-2xl font-semibold text-center mb-4">{{ countryName }}</h2>
 
-    <!-- Checkbox Filter -->
+    <!-- Metric filter checkboxes -->
     <div class="flex flex-wrap justify-center gap-4 mb-6">
       <label
         v-for="metric in allMetrics"
@@ -19,9 +19,9 @@
       </label>
     </div>
 
-    <!-- Chart + Legend Section -->
+    <!-- Chart and Legend -->
     <div class="flex">
-      <!-- Chart Section -->
+      <!-- Main Chart -->
       <div class="flex-grow overflow-x-hidden">
         <svg
           ref="chartRef"
@@ -29,7 +29,9 @@
           viewBox="0 0 1000 500"
           preserveAspectRatio="xMinYMin meet"
         ></svg>
-      </div>      <!-- Legend (right side) -->
+      </div>
+
+      <!-- Legend -->
       <div class="w-40 ml-1 flex flex-col gap-4 text-sm text-gray-800 mt-4">
         <div
           v-for="metric in selectedMetrics"
@@ -45,10 +47,10 @@
       </div>
     </div>
 
-    <!-- Year Slider -->
+    <!-- Year slider -->
     <div
       v-if="minYear !== null && maxYear !== null"
-      class=" flex flex-col items-center gap-2"
+      class="flex flex-col items-center gap-2"
     >
       <label for="startYearRange" class="font-medium text-sm text-gray-800">
         Starting year: <span class="font-bold text-gray-800">{{ startYear }}</span>
@@ -57,13 +59,13 @@
         id="startYearRange"
         type="range"
         :min="minYear"
-        :max=2020
+        :max="2020"
         v-model.number="startYear"
         class="w-full max-w-xl h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-thumb"
       />
     </div>
 
-    <!-- Tooltip -->
+    <!-- Tooltip Box -->
     <div
       ref="tooltip"
       class="tooltip absolute bg-white border border-gray-300 p-2 text-xs shadow-lg pointer-events-none z-10"
@@ -75,58 +77,50 @@
   </div>
 </template>
 
-
-
 <script setup>
-import { ref, onMounted, watch, nextTick, computed } from 'vue'
+// Imports
+import { ref, onMounted, watch, nextTick } from 'vue'
 import * as d3 from 'd3'
 
-const props = defineProps({
-  iso: String,
-  countryName: String
-})
-
+// Props & Emits
+const props = defineProps({ iso: String, countryName: String })
 const emit = defineEmits(['processed-data'])
 
+// References
 const chartRef = ref(null)
+const tooltip = ref(null)
+
+// Dimensions
 const width = ref(10000)
 const height = ref(500)
 
+// UI State
 const allMetrics = ref([])
 const selectedMetrics = ref([])
 
+// Year range
 const startYear = ref(null)
 const minYear = ref(1940)
 const maxYear = ref(null)
 
-const tooltip = ref(null)
+// Global extent for temperature
+const globalTempExtent = ref([0, 1])
 
-const globalTempExtent = ref([0, 1]) 
+// Color palette & scale
+const customPalette = ['#1f77b4', '#d62728', '#ff7f0e', '#2ca02c']
+const colorScale = d3.scaleOrdinal().range(customPalette)
+function color(metric) {
+  return colorScale(metric)
+}
 
-const customPalette = [
-    '#1f77b4',
-    '#d62728',
-    '#ff7f0e',
-    '#2ca02c',
-  ]
-
-  const colorScale = d3.scaleOrdinal()
-    .domain(allMetrics.value)
-    .range(customPalette)
-
-  function color(metric) {
-    return colorScale(metric)
-  }
-
-
-// CSV-Rohdaten importieren
+// Import raw CSVs
 import CO2CapitaRaw from '../assets/co-emissions-per-capita.csv?raw'
 import CO2Raw from '../assets/annual-co2-emissions-per-country.csv?raw'
 import EnergyShareRaw from '../assets/energyshare-from-renewables.csv?raw'
 import ElectricityShareRaw from '../assets/share-electricity-renewables.csv?raw'
 import TempRaw from '../assets/annual-temperature-anomalies.csv?raw'
 
-// CSVs parsen
+// CSV parsing helper
 function parseCSV(raw, valueKey, metricName) {
   const data = d3.csvParse(raw)
   return data.map(row => ({
@@ -137,56 +131,57 @@ function parseCSV(raw, valueKey, metricName) {
   })).filter(d => d.iso && !isNaN(d.value))
 }
 
+// Final unified dataset
 const processedData = [
   ...parseCSV(CO2Raw, 'CO2', 'CO₂'),
-  //...parseCSV(CO2CapitaRaw, 'CO2', 'CO₂ per capita'),
+  // ...parseCSV(CO2CapitaRaw, 'CO2', 'CO₂ per capita'),
   ...parseCSV(TempRaw, 'Temperature anomaly', 'Temperature'),
   ...parseCSV(EnergyShareRaw, 'Share', 'Share of renewable energy'),
   ...parseCSV(ElectricityShareRaw, 'Share', 'Share of renewable electricity')
 ]
 
+// Watch for changes and re-render chart
+watch([() => props.iso, selectedMetrics, startYear], drawChart)
 
-watch(
-  [() => props.iso, selectedMetrics, startYear], 
-  drawChart, 
-  { immediate: false }
-)
-
+// Lifecycle: on mount, initialize layout, state, and draw chart
 onMounted(async () => {
   await nextTick()
   const container = chartRef.value?.parentElement
   if (container) {
-    const bounds = container.getBoundingClientRect()
-    width.value = bounds.width
+    width.value = container.getBoundingClientRect().width
     height.value = 500
   }
 
   const allTempData = processedData.filter(d => d.metric === 'Temperature' && d.iso === props.iso)
   globalTempExtent.value = d3.extent(allTempData, d => d.value)
+
   const metrics = [...new Set(processedData.map(d => d.metric))]
   allMetrics.value = metrics
   selectedMetrics.value = metrics
 
-  const allYearsSorted = [...new Set(processedData.map(d => d.year))].sort((a,b) => a - b)
-  minYear.value = allYearsSorted[0] < 1940 ? 1940 : allYearsSorted[0]
-  maxYear.value = allYearsSorted[allYearsSorted.length - 1]
+  const allYearsSorted = [...new Set(processedData.map(d => d.year))].sort((a, b) => a - b)
+  minYear.value = Math.max(1940, allYearsSorted[0])
+  maxYear.value = allYearsSorted.at(-1)
   startYear.value = minYear.value
 
   drawChart()
   emit('processed-data', processedData)
 })
 
+// Main chart logic
 function drawChart() {
   if (!props.iso) return
 
   const svg = d3.select(chartRef.value)
   svg.selectAll('*').remove()
+
   const margin = { top: 20, right: 60, bottom: 60, left: 60 }
   const innerWidth = width.value - margin.left - margin.right
   const innerHeight = height.value - margin.top - margin.bottom
 
   const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
 
+  // Filter data for selected country and year range
   const filtered = processedData.filter(d =>
     d.iso === props.iso &&
     d.value != null &&
@@ -198,80 +193,70 @@ function drawChart() {
     filtered.filter(d => selectedMetrics.value.includes(d.metric)),
     d => d.metric
   )
+
   const allYears = [...new Set(filtered.map(d => d.year))].sort()
 
-  const tempData = grouped.get('Temperature') || []
-  const tempExtent = d3.extent(tempData, d => d.value)
+  // Temperature scale
+  const yTemp = d3.scaleLinear()
+    .domain(globalTempExtent.value)
+    .range([innerHeight, 0])
+    .nice()
 
+  // Normalized scale (for other metrics)
+  const yNorm = d3.scaleLinear().domain([0, 1]).range([innerHeight, 0])
+
+  // Metric-specific normalization ranges
   const groupedFull = d3.group(
     processedData.filter(d => d.iso === props.iso && d.value != null),
     d => d.metric
   )
 
   const metricsToNormalize = [...grouped.keys()].filter(
-    m => m !== 'Temperature' && !['Share of renewable energy', 'Share of renewable electricity'].includes(m)
+    m => m !== 'Temperature' && !m.includes('renewable')
   )
+
   const metricRanges = {}
   for (const metric of metricsToNormalize) {
-    const vals = groupedFull.get(metric).map(d => d.value)
-    metricRanges[metric] = {
-      min: Math.min(...vals),
-      max: Math.max(...vals)
-    }
+    const values = groupedFull.get(metric).map(d => d.value)
+    metricRanges[metric] = { min: Math.min(...values), max: Math.max(...values) }
   }
 
-  const x = d3.scaleLinear().domain(d3.extent(allYears)).range([0, innerWidth])
+  const x = d3.scaleLinear()
+    .domain(d3.extent(allYears))
+    .range([0, innerWidth])
 
-  const yTemp = d3.scaleLinear()
-    .domain(globalTempExtent.value)
-    .range([innerHeight, 0])
-    .nice()
-
-
-  const yNorm = d3.scaleLinear().domain([0, 1]).range([innerHeight, 0])
-
-
-
+  // Draw lines for each selected metric
   for (const [metric, values] of grouped) {
     const sorted = values.sort((a, b) => a.year - b.year)
-    let lineGenerator
 
-    if (metric === 'Temperature') {
-      lineGenerator = d3.line()
-        .x(d => x(d.year))
-        .y(d => yTemp(d.value))
-        .curve(d3.curveMonotoneX)
-    } else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) {
-      lineGenerator = d3.line()
-        .x(d => x(d.year))
-        .y(d => yNorm(d.value / 100))
-        .curve(d3.curveMonotoneX)
-    } else {
-      const { min, max } = metricRanges[metric]
-      lineGenerator = d3.line()
-        .x(d => x(d.year))
-        .y(d => yNorm((d.value - min) / (max - min)))
-        .curve(d3.curveMonotoneX)
-    }
+    const line = d3.line()
+      .x(d => x(d.year))
+      .y(d => {
+        if (metric === 'Temperature') return yTemp(d.value)
+        if (metric.includes('renewable')) return yNorm(d.value / 100)
+        const { min, max } = metricRanges[metric]
+        return yNorm((d.value - min) / (max - min))
+      })
+      .curve(d3.curveMonotoneX)
 
     g.append('path')
       .datum(sorted)
       .attr('fill', 'none')
       .attr('stroke', color(metric))
       .attr('stroke-width', 2)
-      .attr('d', lineGenerator)
+      .attr('d', line)
   }
 
+  // Add axes
   g.append('g').call(d3.axisLeft(yTemp)).selectAll('text').style('font-size', '10px')
   g.append('text')
-  .attr('transform', 'rotate(-90)')
-  .attr('y', -50)
-  .attr('x', -innerHeight / 2)
-  .attr('dy', '1em')
-  .style('text-anchor', 'middle')
-  .style('font-size', '12px')
-  .text('Temperature (°C)')
-
+    .attr('transform', 'rotate(-90)')
+    .attr('y', -50)
+    .attr('x', -innerHeight / 2)
+    .attr('dy', '1em')
+    .style('text-anchor', 'middle')
+    .style('font-size', '12px')
+    .text('Temperature (°C)')
 
   g.append('g')
     .attr('transform', `translate(${innerWidth},0)`)
@@ -285,7 +270,7 @@ function drawChart() {
     .selectAll('text')
     .style('font-size', '10px')
 
-  // Tooltip + Hover
+  // Tooltip logic
   const focusLine = g.append('line')
     .attr('class', 'hover-line')
     .attr('y1', 0)
@@ -332,12 +317,10 @@ function drawChart() {
     focusLine.attr('x1', x(xYear)).attr('x2', x(xYear)).style('opacity', 1)
     yearLabel.text(`${xYear}`)
 
-    tooltipGroup.selectAll('.tooltip-entry').remove()
-    tooltipGroup.selectAll('text:not(#year-label)').remove()
-    tooltipGroup.selectAll('circle').remove()
+    tooltipGroup.selectAll('.tooltip-entry, text:not(#year-label), circle').remove()
     g.selectAll('.focus-point').remove()
 
-    let visibleEntries = []
+    const visibleEntries = []
 
     selectedMetrics.value.forEach(metric => {
       const data = grouped.get(metric)
@@ -346,17 +329,13 @@ function drawChart() {
 
       let yVal
       if (metric === 'Temperature') yVal = yTemp(entry.value)
-      else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) {
-        yVal = yNorm(entry.value / 100)
-      } else {
+      else if (metric.includes('renewable')) yVal = yNorm(entry.value / 100)
+      else {
         const { min, max } = metricRanges[metric]
         yVal = yNorm((entry.value - min) / (max - min))
       }
 
-      let unit = ''
-      if (metric === 'Temperature') unit = '°C'
-      else if (['Share of renewable energy', 'Share of renewable electricity'].includes(metric)) unit = '%'
-      else unit = 't'
+      const unit = metric === 'Temperature' ? '°C' : metric.includes('renewable') ? '%' : 't'
 
       visibleEntries.push({ metric, value: entry.value, unit, y: yVal })
     })
@@ -375,13 +354,9 @@ function drawChart() {
         .attr('y', 34 + i * 20)
         .attr('font-size', '12px')
         .attr('fill', '#333')
-        .text(() => {
-          if (entry.metric === 'CO₂' || entry.metric === 'CO₂ per capita') {
-            return `${entry.metric}: ${formatCO2(entry.value)}`
-          } else {
-            return `${entry.metric}: ${entry.value.toFixed(2)} ${entry.unit}`
-          }
-        })
+        .text(() =>
+          entry.metric === 'CO₂' ? `${entry.metric}: ${formatCO2(entry.value)}` : `${entry.metric}: ${entry.value.toFixed(2)} ${entry.unit}`
+        )
 
       g.append('circle')
         .attr('class', 'focus-point')
@@ -394,16 +369,9 @@ function drawChart() {
 
     tooltipBg.attr('height', visibleEntries.length * 20 + 30)
 
-    // Intelligente Positionierung
-    const tooltipWidth = 230
     let tooltipX = x(xYear) + 15
-    if (tooltipX + tooltipWidth > innerWidth) {
-      tooltipX = x(xYear) - tooltipWidth - 15
-    }
-
-    tooltipGroup
-      .attr('transform', `translate(${tooltipX}, 20)`)
-      .style('opacity', 1)
+    if (tooltipX + 230 > innerWidth) tooltipX = x(xYear) - 230 - 15
+    tooltipGroup.attr('transform', `translate(${tooltipX}, 20)`).style('opacity', 1)
   })
 
   overlay.on('mouseleave', () => {
@@ -411,15 +379,15 @@ function drawChart() {
     tooltipGroup.style('opacity', 0)
     g.selectAll('.focus-point').remove()
   })
+
   emit('processed-data', processedData)
 }
 
+// Format CO₂ values with SI suffix
 function formatCO2(value) {
   if (value >= 1e9) return (value / 1e9).toFixed(2) + ' B t'
   if (value >= 1e6) return (value / 1e6).toFixed(2) + ' M t'
   if (value >= 1e3) return (value / 1e3).toFixed(2) + ' K t'
   return value.toFixed(2) + ' t'
 }
-
-
 </script>
