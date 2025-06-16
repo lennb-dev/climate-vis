@@ -8,9 +8,9 @@ Webhosted: https://climate-vis.vercel.app/
 
 ### 1. Data Switcher
    - **Data Switcher**: Toggle between different environmental datasets (e.g., CO₂, temperature, renewables) to update the map display.
-   - **CO₂ Emissions**: Display and comparison of country-level CO₂ emissions (metric tons/year).
+   - **CO₂ Emissions**: Display and comparison of country-level CO₂ emissions over time.
    - **CO₂ Emissions per Capita**: Display and comparison of CO₂ emissions per capita across different countries over time.
-   - **Temperature Anomalies**: Visualization of global temperature changes and anomalies in different regions (compared to the mean of the temperatures from 1991-2020).
+   - **Temperature**: Visualization of global temperature changes and anomalies in different countries (compared to the mean of the temperatures from 1991-2020).
    - **Share of Renewable Energy**: Representation of the percentage of renewable energy in total energy consumption by country.
    - **Share of Renewable Electricity**: Display of electricity generation from renewable sources, compared to the overall electricity consumption.
 
