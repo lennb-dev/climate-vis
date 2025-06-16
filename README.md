@@ -60,11 +60,11 @@ Repository: https://github.com/lennb-dev/climate-vis/tree/main
 
 1. Clone repository
 2. Install node.js and npm (windows: https://nodejs.org/en)
-4. Install dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
-5. Start development server:
+4. Start development server:
    ```bash
    npm run dev
    ```
