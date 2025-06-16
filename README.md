@@ -1,6 +1,7 @@
 # 🌍 Global Environmental Data Visualization
 
-An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO₂ emissions, and renewable energy usage across different countries. Developed by Lennard Beer & Marc Simon Curcic
+An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO₂ emissions, and renewable energy usage across different countries. 
+Developed by Lennard Beer & Marc Simon Curcic
 
 ![grafik](https://github.com/user-attachments/assets/95319db7-cf25-4933-a0d1-514234461fa1)
 
