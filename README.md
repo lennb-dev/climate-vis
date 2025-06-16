@@ -1,6 +1,6 @@
 # 🌍 Global Environmental Data Visualization
 
-An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO2 emissions, and renewable energy usage across different countries.
+An interactive web application developed with Vue 3 and D3.js that visualizes global environmental data through dynamic world maps. The application provides insights into climate change, CO₂ emissions, and renewable energy usage across different countries.
 
 Webhosted: https://climate-vis.vercel.app/
 
