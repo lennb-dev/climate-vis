@@ -55,11 +55,12 @@ Webhosted: https://climate-vis.vercel.app/
 ## Getting Started
 
 1. Clone repository
-2. Install dependencies:
+2. Install node.js and npm (windows: https://nodejs.org/en)
+4. Install dependencies:
    ```bash
    npm install
    ```
-3. Start development server:
+5. Start development server:
    ```bash
    npm run dev
    ```
