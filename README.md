@@ -6,7 +6,7 @@ Webhosted: https://climate-vis.vercel.app/
 
 ## Main Components
 
-1. ### Data Switcher
+### 1. Data Switcher
    - **Data Switcher**: Toggle between different environmental datasets (e.g., CO₂, temperature, renewables) to update the map display.
    - **CO₂ Emissions**: Display and comparison of country-level CO₂ emissions (metric tons/year).
    - **CO₂ Emissions per Capita**: Display and comparison of CO₂ emissions per capita across different countries over time.
@@ -14,21 +14,21 @@ Webhosted: https://climate-vis.vercel.app/
    - **Share of Renewable Energy**: Representation of the percentage of renewable energy in total energy consumption by country.
    - **Share of Renewable Electricity**: Display of electricity generation from renewable sources, compared to the overall electricity consumption.
 
-2. ### World Map Visualization  
+### 2. World Map Visualization  
 - **Color-Encoded Heatmap**: Countries are shaded based on dataset values using custom thresholds.  
 - **Custom Thresholds**: Each dataset defines custom scale domains to ensure visual clarity across varying value ranges.
 - **Interactive Legend**: Automatically updates with the selected data layer, providing context for color-value mappings.
 
-3. ### Timeslider  
+### 3. Timeslider  
    - **Timeslider**: Select any year to view corresponding data.
    - **Playback Control**: Animate the timeline from the selected year to the dataset’s end using play/pause functionality.
 
-4. ### Tooltips  
+### 4. Tooltips  
 - **Hover Details**: Hover over a country to display a line chart showing its historical data for the selected dataset, using dynamic colors that match the current legend scale.
 - **Legend Interaction**: Hovering over legend entries highlights all countries within that threshold range on the map.
 - **Country Dashboard**: Clicking a country opens a detailed dashboard view with extended statistics and charts.
 
-5. ### Country Dashboard
+### 5. Country Dashboard
 
 - **Multi-Dataset Line Chart**: Visualizes all available datasets for the selected country over the full time range. Users can:
   - Adjust the **start year** with a slider below the chart.
