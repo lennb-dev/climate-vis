@@ -6,6 +6,7 @@ Developed by Lennard Beer & Marc Simon Curcic
 ![grafik](https://github.com/user-attachments/assets/95319db7-cf25-4933-a0d1-514234461fa1)
 
 Webhosted: https://climate-vis.vercel.app/
+Repository: https://github.com/lennb-dev/climate-vis/tree/main
 
 ## Main Components
 
